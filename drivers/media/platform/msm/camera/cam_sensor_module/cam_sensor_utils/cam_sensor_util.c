@@ -37,9 +37,14 @@ static struct i2c_settings_list*
 	else
 		return NULL;
 
+
+
+
+
 	tmp->i2c_settings.reg_setting = (struct cam_sensor_i2c_reg_array *)
-		kzalloc(sizeof(struct cam_sensor_i2c_reg_array) *
-		size, GFP_KERNEL);
+		vzalloc(sizeof(struct cam_sensor_i2c_reg_array) * size);
+
+
 	if (tmp->i2c_settings.reg_setting == NULL) {
 		list_del(&(tmp->list));
 		kfree(tmp);
@@ -62,7 +67,9 @@ int32_t delete_request(struct i2c_settings_array *i2c_array)
 
 	list_for_each_entry_safe(i2c_list, i2c_next,
 		&(i2c_array->list_head), list) {
-		kfree(i2c_list->i2c_settings.reg_setting);
+
+
+		vfree(i2c_list->i2c_settings.reg_setting);
 		list_del(&(i2c_list->list));
 		kfree(i2c_list);
 	}
@@ -1628,7 +1635,7 @@ int msm_camera_power_down(struct cam_sensor_power_ctrl_t *ctrl,
 					"config clk reg failed rc: %d", ret);
 				return ret;
 			}
-			//cam_soc_util_clk_disable_default(soc_info);
+
 			for (i = soc_info->num_clk - 1; i >= 0; i--) {
 				cam_soc_util_clk_disable(soc_info->clk[i],
 					soc_info->clk_name[i]);

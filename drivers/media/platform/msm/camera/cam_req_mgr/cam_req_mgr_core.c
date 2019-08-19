@@ -1890,8 +1890,8 @@ static int cam_req_mgr_cb_notify_err(
 		rc = -EPERM;
 		goto end;
 	}
-	spin_unlock_bh(&link->link_state_spin_lock);
 	crm_timer_reset(link->watchdog);
+	spin_unlock_bh(&link->link_state_spin_lock);
 
 	task = cam_req_mgr_workq_get_task(link->workq);
 	if (!task) {
@@ -1953,8 +1953,8 @@ static int cam_req_mgr_cb_notify_trigger(
 		rc = -EPERM;
 		goto end;
 	}
-	spin_unlock_bh(&link->link_state_spin_lock);
 	crm_timer_reset(link->watchdog);
+	spin_unlock_bh(&link->link_state_spin_lock);
 
 	task = cam_req_mgr_workq_get_task(link->workq);
 	if (!task) {
@@ -2184,10 +2184,10 @@ static int __cam_req_mgr_unlink(struct cam_req_mgr_core_link *link)
 	mutex_lock(&link->lock);
 	spin_lock_bh(&link->link_state_spin_lock);
 	link->state = CAM_CRM_LINK_STATE_IDLE;
-	spin_unlock_bh(&link->link_state_spin_lock);
-
 	/* Destroy timer of link */
 	crm_timer_exit(&link->watchdog);
+	spin_unlock_bh(&link->link_state_spin_lock);
+
 	__cam_req_mgr_print_req_tbl(&link->req);
 
 	/* Destroy workq payload data */

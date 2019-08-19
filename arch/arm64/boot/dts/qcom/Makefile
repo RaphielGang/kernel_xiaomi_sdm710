@@ -114,7 +114,6 @@ endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 	dtbo-$(CONFIG_ARCH_SDM670) += \
-		sdm670-cdp-overlay.dtbo \
 		sdm670-mtp-overlay.dtbo \
 		sdm670-rumi-overlay.dtbo \
 		sdm670-qrd-overlay.dtbo \
@@ -172,9 +171,10 @@ ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 		sirius-sdm710-overlay.dtbo \
 		sirius-sdm670-overlay.dtbo \
 		grus-sdm710-overlay.dtbo \
-		grus-sdm712-overlay.dtbo
+		grus-sdm712-overlay.dtbo \
+		pyxis-sdm710-overlay.dtbo \
+		vela-sdm710-overlay.dtbo
 
-sdm670-cdp-overlay.dtbo-base := sdm670.dtb
 sdm670-mtp-overlay.dtbo-base := sdm670.dtb
 sdm670-rumi-overlay.dtbo-base := sdm670.dtb
 sdm670-qrd-overlay.dtbo-base := sdm670.dtb
@@ -213,6 +213,8 @@ sirius-sdm710-overlay.dtbo-base := sdm710.dtb
 sirius-sdm670-overlay.dtbo-base := sdm670.dtb
 grus-sdm710-overlay.dtbo-base := sdm710.dtb
 grus-sdm712-overlay.dtbo-base := sdm710.dtb
+pyxis-sdm710-overlay.dtbo-base := sdm710.dtb
+vela-sdm710-overlay.dtbo-base := sdm710.dtb
 qcs605-lc-mtp-overlay.dtbo-base := qcs605-lc.dtb
 qcs605-lc-ipcamera-overlay.dtbo-base := qcs605-lc-ipcamera-base.dtb
 qcs605-360camera-overlay.dtbo-base := qcs605.dtb
@@ -254,7 +256,6 @@ sxr1130-usbc-pm660a-mtp-overlay.dtbo-base := sxr1130.dtb
 else
 dtb-$(CONFIG_ARCH_SDM670) += sdm670-rumi.dtb \
 	sdm670-mtp.dtb \
-	sdm670-cdp.dtb \
 	sdm670-qrd.dtb \
 	sdm670-qrd-sku2.dtb \
 	sdm670-pm660a-mtp.dtb \
@@ -306,7 +307,9 @@ dtb-$(CONFIG_ARCH_SDM670) += sdm670-rumi.dtb \
 	sirius-sdm710.dtb \
 	sirius-sdm670.dtb \
 	grus-sdm710.dtb \
-	grus-sdm712.dtb
+	grus-sdm712.dtb \
+	pyxis-sdm710.dtb \
+	vela-sdm710.dtb
 endif
 
 ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)

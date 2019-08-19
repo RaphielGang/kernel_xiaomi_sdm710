@@ -172,7 +172,7 @@ static int cam_vfe_top_set_axi_bw_vote(
 		sum.uncompressed_bw) ||
 		(top_priv->to_be_applied_axi_vote.compressed_bw !=
 		sum.compressed_bw)) {
-		// we got a new bw value to apply
+
 		top_priv->counter_to_update_axi_vote = 0;
 
 		top_priv->to_be_applied_axi_vote.uncompressed_bw =

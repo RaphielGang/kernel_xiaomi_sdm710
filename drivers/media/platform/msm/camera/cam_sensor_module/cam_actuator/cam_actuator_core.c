@@ -22,7 +22,7 @@
 #define FIRMWARE_NAME "bu64748gwz.prog"
 #define ACTUATOR_TRANS_SIZE 32
 
-//#define USE_BU64748 1
+
 
 int32_t cam_actuator_construct_default_power_setting(
 	struct cam_sensor_power_ctrl_t *power_info)
@@ -148,7 +148,7 @@ static int cam_actuator_fw_download(struct cam_actuator_ctrl_t *a_ctrl)
 	const struct firmware *fw = NULL;
 	const char *fw_name_prog = NULL;
 	struct device *dev = NULL;
-	struct cam_sensor_i2c_reg_setting write_setting;//i2c_reg_setting;
+	struct cam_sensor_i2c_reg_setting write_setting;
 	struct page *page = NULL;
 	uint8_t id[2] = {0};
 
@@ -161,7 +161,7 @@ static int cam_actuator_fw_download(struct cam_actuator_ctrl_t *a_ctrl)
 
 	rc = camera_io_dev_read_seq(&(a_ctrl->io_master_info), 0x825f, id, CAMERA_SENSOR_I2C_TYPE_WORD, 2);
 
-	if(rc < 0) {
+	if (rc < 0) {
 		CAM_ERR(CAM_ACTUATOR, "check version 0x825f value [0x%x] error",(id[0] << 8) | id[1]);
 	}
 
@@ -194,8 +194,8 @@ static int cam_actuator_fw_download(struct cam_actuator_ctrl_t *a_ctrl)
 	}
 	write_setting.reg_setting = (struct cam_sensor_i2c_reg_array *)(
 			page_address(page));
-	write_setting.delay = 0; //initialize delay value,otherwise CCI write will hang becase of a very long delay
-	for(i = 0, ptr = (uint8_t *)fw->data; i < total_bytes;) {
+	write_setting.delay = 0;
+	for (i = 0, ptr = (uint8_t *)fw->data; i < total_bytes;) {
 		for (cnt = 0; cnt < ACTUATOR_TRANS_SIZE && i < total_bytes;
 			cnt++, ptr++, i++) {
 			write_setting.reg_setting[cnt].reg_addr = 0x80;
@@ -703,7 +703,7 @@ int32_t cam_actuator_i2c_pkt_parse(struct cam_actuator_ctrl_t *a_ctrl,
 		}
 
 #ifdef CONFIG_USE_BU64748
-		//for sunny imx363 hard code
+
 		if (a_ctrl->io_master_info.cci_client->sid == 0x18/2) {
 			CAM_DBG(CAM_ACTUATOR, "init setting dac 2nd supply");
 			rc = cam_actuator_apply_settings(a_ctrl,

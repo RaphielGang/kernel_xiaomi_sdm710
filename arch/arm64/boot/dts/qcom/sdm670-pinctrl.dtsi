@@ -66,8 +66,8 @@ g*
 				 */
 				drive-strength = <8>;
 				output-high; /* active low reset */
-                        };
-                };
+				};
+		};
 
 		/* QUPv3 South SE mappings */
 		/* SE 0 pin mappings */
@@ -126,6 +126,33 @@ g*
 					pins = "gpio0", "gpio1", "gpio2",
 								"gpio3";
 					drive-strength = <6>;
+					bias-disable;
+				};
+			};
+		};
+		qupv3_se0_2uart_pins: qupv3_se0_2uart_pins {
+			qupv3_se0_2uart_active: qupv3_se0_2uart_active {
+				mux {
+					pins = "gpio2","gpio3";
+					function = "qup0";
+				};
+
+				config {
+					pins =  "gpio2","gpio3";
+					drive-strength = <2>;
+					bias-disable;
+				};
+			};
+
+			qupv3_se0_2uart_sleep: qupv3_se0_2uart_sleep {
+				mux {
+					pins = "gpio2","gpio3";
+					function = "gpio";
+				};
+
+				config {
+					pins ="gpio2","gpio3";
+					drive-strength = <2>;
 					bias-disable;
 				};
 			};

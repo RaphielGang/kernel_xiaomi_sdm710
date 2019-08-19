@@ -68,11 +68,11 @@
 #define NX30P6093_ISOURCE_ALWAYS_ON_TDUTY_MS	300000
 
 /* configuration data */
-#define NX30P6093_VIN_ISOURCE_VAL		0xd
+#define NX30P6093_VIN_ISOURCE_VAL		0xb
 #define NX30P6093_VIN_VOLTAGE_TAG_VAL		0xad
-#define NX30P6093_ISOURCE_TDET_VAL		0x5
+#define NX30P6093_ISOURCE_TDET_VAL		0x6
 #define NX30P6093_ISOURCE_TDUTY_VAL		0x0
-#define NX30P6093_ISOURCE_TDET_MS		10
+#define NX30P6093_ISOURCE_TDET_MS		20
 
 struct nx30p6093_info {
 	struct device		*dev;
@@ -189,6 +189,7 @@ static int nx30p6093_read_impedance_status(struct nx30p6093_info *info)
 			>> NX30P6093_IMPEDANCE_SHIFT;
 	if (impedance == NX30P6093_IMPEDANCE_GOOD_VAL && info->high_impedance) {
 		info->high_impedance = false;
+		pr_info("NX30P6093: moisture detect good, enable cc detection\n");
 		/* enable the type-C CC detection */
 		psp_val.intval = 0;
 		rc = power_supply_set_property(info->usb_psy,
@@ -196,6 +197,7 @@ static int nx30p6093_read_impedance_status(struct nx30p6093_info *info)
 					&psp_val);
 	} else if (impedance == NX30P6093_IMPEDANCE_BAD_VAL) {
 		info->high_impedance = true;
+		pr_info("NX30P6093: moisture detect bad, disable cc detection\n");
 		/* disable the type-C CC detection */
 		psp_val.intval = 1;
 		rc = power_supply_set_property(info->usb_psy,

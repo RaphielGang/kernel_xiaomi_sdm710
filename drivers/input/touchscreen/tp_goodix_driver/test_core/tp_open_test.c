@@ -52,7 +52,7 @@ static s32 modify_diff_statistic_data(PST_TEST_ITEM p_test_item);
 *******************************************************************************/
 extern s32 rawdata_test_sets_func(IN_OUT ptr32 p_data)
 {
-	//You can leran more details from code gtp
+
 	s32 ret = 0;
 	u8 i = 0;
 	u8 offse_and_accord_flag = 0;
@@ -1830,8 +1830,8 @@ extern s32 get_rawdata_jitter_limit(IN PST_TEST_ITEM p_test_item)
 	return ret;
 }
 
-//-----------------------------diffdata as data source start-------------------------------//
-//
+
+
 /*******************************************************************************
 * Function Name  : get_chn_diffdata
 * Description    : get specialized channel diffdata

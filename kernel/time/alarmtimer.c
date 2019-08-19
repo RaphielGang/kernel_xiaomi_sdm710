@@ -39,9 +39,9 @@ struct alarmtimer_record_buff {
 };
 
 static struct alarmtimer_record_buff alarmtimer_set_record_buff[ALARMTIMER_RECORD_MAX];
-static u32 alarmtimer_num = 0;
-static u32 index_head = 0;
-static u32 index_tail = 0;
+static u32 alarmtimer_num;
+static u32 index_head;
+static u32 index_tail;
 #endif
 
 /**
@@ -73,7 +73,7 @@ static DEFINE_SPINLOCK(rtcdev_lock);
 #ifdef ENABLE_ALARMTIMER_RECORD
 static void alarmtimer_collect(struct alarm *alarm)
 {
-	static int m = 0;
+	static int m;
 	char alarmtimer_creator[30] = {0};
 
 	if (!spin_trylock(&alarmtimer_lock))
@@ -85,7 +85,7 @@ static void alarmtimer_collect(struct alarm *alarm)
 	getnstimeofday(&alarmtimer_set_record_buff[m].alarmtimer_set_time);
 	sprintf(alarmtimer_set_record_buff[m++].alarmtimer_set_msg, "%s, %llu", alarmtimer_creator, ktime_to_ms(alarm->node.expires));
 
-	if(m >= ALARMTIMER_RECORD_MAX) {
+	if (m >= ALARMTIMER_RECORD_MAX) {
 		m = 0;
 	}
 

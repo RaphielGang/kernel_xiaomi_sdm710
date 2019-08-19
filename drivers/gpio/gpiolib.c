@@ -3539,8 +3539,8 @@ static void gpiolib_dbg_show(struct seq_file *s, struct gpio_device *gdev)
 	for (i = 0; i < gdev->ngpio; i++, gpio++, gdesc++) {
 		if (!test_bit(FLAG_REQUESTED, &gdesc->flags)) {
 			if (gdesc->name) {
-				    seq_printf(s, " gpio-%-3d (%-20.20s)\n",
-					   gpio, gdesc->name);
+				seq_printf(s, " gpio-%-3d (%-20.20s)\n",
+						gpio, gdesc->name);
 			}
 			continue;
 		}
@@ -3609,17 +3609,17 @@ static int gpiolib_seq_show(struct seq_file *s, void *v)
 
 	if (!chip) {
 		seq_printf(s, "%s%s: (dangling chip)", (char *)s->private,
-			   dev_name(&gdev->dev));
+				dev_name(&gdev->dev));
 		return 0;
 	}
 	seq_printf(s, "%s%s: GPIOs %d-%d", (char *)s->private,
-		   dev_name(&gdev->dev),
-		   gdev->base, gdev->base + gdev->ngpio - 1);
+			dev_name(&gdev->dev),
+			gdev->base, gdev->base + gdev->ngpio - 1);
 	parent = chip->parent;
 	if (parent)
 		seq_printf(s, ", parent: %s/%s",
-			   parent->bus ? parent->bus->name : "no-bus",
-			   dev_name(parent));
+				parent->bus ? parent->bus->name : "no-bus",
+				dev_name(parent));
 	if (chip->label)
 		seq_printf(s, ", %s", chip->label);
 	if (chip->can_sleep)

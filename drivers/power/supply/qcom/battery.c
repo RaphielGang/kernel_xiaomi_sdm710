@@ -1032,6 +1032,13 @@ static void handle_main_charge_type(struct pl_data *chip)
 	int taper_soc = 0;
 	int taper_vbatt = 0;
 
+	/*
+	 * If charge type failed to change to taper, pl_taper_work cannot
+	 * be launched anymore, so parallel charging cannot be disabled,
+	 * if battery capacity is high, do not allow parallel charging
+	 * to protect the battery avoiding battery over voltage if
+	 * pm670 charge type may failed to change from fast to taper.
+	 */
 	rc = power_supply_get_property(chip->batt_psy,
 			POWER_SUPPLY_PROP_CAPACITY, &pval);
 	if (rc < 0) {

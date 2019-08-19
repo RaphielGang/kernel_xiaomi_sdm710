@@ -15,6 +15,8 @@
 #include "cam_cci_core.h"
 #include "cam_cci_dev.h"
 
+#include <soc/qcom/socinfo.h>
+
 static int32_t cam_cci_convert_type_to_num_bytes(
 	enum camera_sensor_i2c_type type)
 {
@@ -527,6 +529,8 @@ void cam_cci_get_clk_rates(struct cci_device *cci_dev,
 	return;
 }
 
+extern uint32_t g_operation_mode;
+extern uint32_t hw_version_platform;
 static int32_t cam_cci_set_clk_param(struct cci_device *cci_dev,
 	struct cam_cci_ctrl *c_ctrl)
 {
@@ -536,6 +540,16 @@ static int32_t cam_cci_set_clk_param(struct cci_device *cci_dev,
 	struct cam_hw_soc_info *soc_info =
 		&cci_dev->soc_info;
 	void __iomem *base = soc_info->reg_map[0].mem_base;
+
+	if ((hw_version_platform == HARDWARE_PLATFORM_PYXIS) || (hw_version_platform == HARDWARE_PLATFORM_VELA)) {
+		if (g_operation_mode == 0x8006) {
+			i2c_freq_mode = I2C_FAST_PLUS_MODE;
+			CAM_DBG(CAM_CCI, "face_unlock mode, set i2c_freq_mode to fast plus mode.");
+		} else {
+			i2c_freq_mode = c_ctrl->cci_info->i2c_freq_mode;
+			CAM_DBG(CAM_CCI, "normal mode, set i2c_freq_mode according to driver's setting.");
+		}
+	}
 
 	if ((i2c_freq_mode >= I2C_MAX_MODES) || (i2c_freq_mode < 0)) {
 		CAM_ERR(CAM_CCI, "invalid i2c_freq_mode = %d", i2c_freq_mode);

@@ -4600,6 +4600,8 @@ static void icnss_ant_parse_dt(struct device *dev)
 	if (!gpio_is_valid(gpio_wifi_ant))
 		icnss_pr_err("wifi ant gpio invalid\n!");
 
+	gpio_request(gpio_wifi_ant, "wifi_ant");
+	gpio_direction_output(gpio_wifi_ant, 0);
 	icnss_pr_err("wifi ant gpio is: %d\n!", gpio_wifi_ant);
 }
 #endif

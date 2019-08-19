@@ -520,7 +520,7 @@ static int qpnp_haptics_auto_res_enable(struct hap_chip *chip, bool enable)
 
 	if (auto_res_mode_qwd && enable)
 		usleep_range(delay_us, delay_us + 1);
-	if(get_hw_version_platform()== HARDWARE_PLATFORM_GRUS){
+	if (get_hw_version_platform()== HARDWARE_PLATFORM_GRUS){
 		pr_debug("hardcode val=0 upon Qualcomm change solution in HARDWARE_PLATFORM_GRUS;\n");
 		enableval = 0;
 	}
@@ -1240,7 +1240,7 @@ static int qpnp_haptics_auto_mode_config(struct hap_chip *chip, int time_ms)
 		/*
 		 * only change pattern for different vibration cycle.
 		 * */
-		if( chip->effect_max) {
+		if ( chip->effect_max) {
 			int i = 0;
 			if (index != chip->effect_index) {
 				if (index >= chip->effect_max) {

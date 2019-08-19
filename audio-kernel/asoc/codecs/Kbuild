@@ -220,6 +220,8 @@ wsa881x_analog_dlkm-y := $(WSA881X_ANALOG_OBJS)
 obj-$(CONFIG_SND_SOC_MSM_STUB) += stub_dlkm.o
 stub_dlkm-y := $(STUB_OBJS)
 
+obj-y	+= tas2562/
+
 obj-$(CONFIG_SND_SOC_WCD_CPE) += wcd_cpe_dlkm.o
 wcd_cpe_dlkm-y := $(WCD_CPE_OBJS)
 

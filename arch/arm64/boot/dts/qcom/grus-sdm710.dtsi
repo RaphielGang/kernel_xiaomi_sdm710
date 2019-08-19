@@ -294,7 +294,7 @@
 	/*		goodix,pen-enable; */
 	/*		goodix,key-of-pen = <331 332>; */ /*BTN_STYLUS, BTN_STYLUS2*/
 			sensor1 {
-					normal-cfg = [ 
+					normal-cfg = [
 					];
 					goodix,fw-name = "goodix_gt9886_fw_f2.bin";
 					goodix,limit-name = "goodix_gt9886_limit_f2.tporder";
@@ -450,11 +450,7 @@
 
 &soc {
 	qcom,ion {
-		compatible = "qcom,msm-ion";
-		#address-cells = <1>;
-		#size-cells = <0>;
-
-	    qcom,ion-heap@14 {
+		qcom,ion-heap@14 {
 			reg = <14>;
 			qcom,ion-heap-type = "SECURE_CARVEOUT";
 			node1 {
@@ -462,7 +458,7 @@
 				token = <0x20000000>; /* ION_FLAG_CP_CDSP */
 			};
 		};
-   };
+	};
 };
 
 &qupv3_se4_spi {

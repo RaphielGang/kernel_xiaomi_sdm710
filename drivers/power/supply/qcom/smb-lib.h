@@ -30,6 +30,14 @@ enum print_reason {
 	PR_OEM          = BIT(5),
 };
 
+enum hvdcp3_type {
+	HVDCP3_NONE = 0,
+	HVDCP3_CLASSA_18W,
+	HVDCP3_CLASSB_27W,
+	USB_PD,
+	HVDCP2_TYPE,
+};
+
 #define DEFAULT_VOTER			"DEFAULT_VOTER"
 #define USER_VOTER			"USER_VOTER"
 #define PD_VOTER			"PD_VOTER"
@@ -368,6 +376,7 @@ struct smb_charger {
 	int			fake_batt_status;
 	bool			step_chg_enabled;
 	bool			sw_jeita_enabled;
+	bool                    dynamic_fv_enabled;
 	bool			is_hdc;
 	bool			chg_done;
 	bool			connector_type;
@@ -399,6 +408,7 @@ struct smb_charger {
 	bool			in_chg_lock;
 	bool                    check_vbus_once;
 	bool                    unstandard_hvdcp;
+	bool			support_hw_scpcharger;
 
 	/* workaround flag */
 	u32			wa_flags;

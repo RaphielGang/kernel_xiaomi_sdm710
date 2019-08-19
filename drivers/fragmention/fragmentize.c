@@ -102,7 +102,7 @@ static int __init fragmentize_init(void)
 	if (block_order >= MAX_ORDER)
 		block_order = MAX_ORDER - 1;
 
-	// if block_order=zero mean only accupy not to fragmention
+
 	if (0 == block_order) {
 		if (DEFAULT_ACCUPY_SIZE != accupy)
 			alloc_times = (accupy * SZ_1M) >> PAGE_SHIFT;
@@ -139,7 +139,7 @@ static int __init fragmentize_init(void)
 				}
 			}
 		} else {
-			//printk("tried %d times\n", i);
+
 			break;
 		}
 
@@ -167,7 +167,7 @@ static void __exit fragmentize_exit(void)
 
 	if (NULL != pfn_occupy) {
 		for (k = 0; k < filled; k++) {
-			//atomic_set(&((pfn_to_page(pfn_free[k]))->_count), 0);
+
 			__free_pages(pfn_to_page(pfn_occupy[k]), 0);
 		}
 		vfree(pfn_occupy);

@@ -1,5 +1,4 @@
 /* Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
- * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -3810,6 +3809,13 @@ static struct snd_soc_card *msm_int_populate_sndcard_dailinks(
 			msm_mi2s_be_dai_links[0].codec_name = CS35L41_CODEC_NAME;
 			msm_mi2s_be_dai_links[0].codec_dai_name = "cs35l41-pcm";
 #endif
+		} else if (HARDWARE_PLATFORM_PYXIS == hw_platform ||
+				HARDWARE_PLATFORM_VELA == hw_platform) {
+			dev_info(dev, "%s: hardware is HARDWARE_PLATFORM_PYXIS or BAMBOO or COSMOS.\n", __func__);
+			msm_mi2s_be_dai_links[0].codec_name = "tas2562.2-004c";
+			msm_mi2s_be_dai_links[0].codec_dai_name = "tas2562 ASI1";
+			msm_mi2s_be_dai_links[1].codec_name = "tas2562.2-004c";
+			msm_mi2s_be_dai_links[1].codec_dai_name = "tas2562 ASI1";
 		} else {
 			dev_info(dev, "%s: hardware is unknown, %d.\n", __func__, hw_platform);
 			msm_mi2s_be_dai_links[0].codec_name = "tas2557.2-004c";

@@ -154,7 +154,7 @@ struct cam_actuator_opcode {
 struct cam_cmd_actuator_info {
 	uint16_t              slave_addr;
 	uint8_t               i2c_freq_mode;
-//	uint8_t               actuator_fw_flag;
+
 	char                  actuator_name[MAX_ACTUATOR_NAME_SIZE];
 	struct cam_actuator_opcode opcode;
 	uint8_t               cmd_type;

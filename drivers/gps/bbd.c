@@ -37,8 +37,7 @@
 #include "bbd.h"
 
 #ifdef CONFIG_SENSORS_SSP
-#include <linux/spi/spi.h>	//Needs because SSP is tightly coupled with SPI
-//#include <linux/spidev.h>
+#include <linux/spi/spi.h>
 
 extern struct spi_driver *pssp_driver;
 extern bool ssp_dbg;
@@ -97,7 +96,6 @@ static const char *bbd_dev_name[BBD_DEVICE_INDEX] = {
 	"bbd_sensor",
 	"bbd_control",
 	"bbd_patch",
-	//"bbd_ssi_spi_debug"
 };
 
 //--------------------------------------------------------------
@@ -115,9 +113,7 @@ static struct bbd_device bbd;
  */
 static unsigned char bbd_patch[] = {
 #ifdef CONFIG_POP
-//#include "bbd_patch_file_pop.h"
 #else
-//#include "bbd_patch_file_solis.h"
 #endif
 };
 
@@ -380,7 +376,6 @@ int bbd_common_open(struct inode *inode, struct file *filp)
 static int bbd_common_release(struct inode *inode, struct file *filp)
 {
 	unsigned int minor = iminor(inode);
-	//struct bbd_device *bbd = filp->private_data;
 
 	pr_info("%s++\n", __func__);
 
@@ -403,7 +398,6 @@ static ssize_t bbd_common_read(struct file *filp,
 							   char __user *buf, size_t size, loff_t *ppos)
 {
 	unsigned int minor = iminor(filp->f_path.dentry->d_inode);
-	//struct bbd_device *bbd = filp->private_data;
 	struct circ_buf *circ = &bbd.priv[minor].read_buf;
 	size_t rd_size = 0;
 
@@ -447,7 +441,6 @@ static ssize_t bbd_common_write(struct file *filp,
 								loff_t *ppos)
 {
 	unsigned int minor = iminor(filp->f_path.dentry->d_inode);
-	//struct bbd_device *bbd = filp->private_data;
 
 	BUG_ON(size >= BBD_BUFF_SIZE);
 
@@ -463,7 +456,6 @@ static ssize_t bbd_common_write(struct file *filp,
 static unsigned int bbd_common_poll(struct file *filp, poll_table *wait)
 {
 	unsigned int minor = iminor(filp->f_path.dentry->d_inode);
-	//struct bbd_device *bbd = filp->private_data;
 	struct circ_buf *circ = &bbd.priv[minor].read_buf;
 	unsigned int mask = 0;
 
@@ -521,7 +513,6 @@ ssize_t bbd_control_write(struct file *filp, const char __user *buf,
 						  size_t size, loff_t *ppos)
 {
 	unsigned int minor = iminor(filp->f_path.dentry->d_inode);
-	//struct bbd_device *bbd = filp->private_data;
 
 	/* get command string first */
 	ssize_t len = bbd_common_write(filp, buf, size, ppos);
@@ -966,5 +957,3 @@ static void __exit bbd_exit(void)
 
 MODULE_AUTHOR("Broadcom");
 MODULE_LICENSE("Dual BSD/GPL");
-//subsys_initcall(bbd_init);
-//module_exit(bbd_exit);

@@ -29,11 +29,14 @@ struct cpu_sync {
 	unsigned int input_boost_min;
 	unsigned int input_boost_freq;
 	unsigned int powerkey_input_boost_freq;
+	unsigned int suspend_boost_min;
+	unsigned int suspend_boost_freq;
 };
 
-enum input_boost_type {
+enum boost_type {
 	default_input_boost,
-	powerkey_input_boost
+	powerkey_input_boost,
+	suspend_boost
 };
 
 static DEFINE_PER_CPU(struct cpu_sync, sync_info);
@@ -42,18 +45,19 @@ static struct workqueue_struct *cpu_boost_wq;
 static struct work_struct input_boost_work;
 static struct work_struct powerkey_input_boost_work;
 static bool input_boost_enabled;
+static bool suspend_boost_enabled;
 
 static unsigned int input_boost_ms = 40;
 module_param(input_boost_ms, uint, 0644);
 
-static unsigned int powerkey_input_boost_ms = 400;
+static unsigned int powerkey_input_boost_ms = 250;
 module_param(powerkey_input_boost_ms, uint, 0644);
 
 static unsigned int sched_boost_on_input;
 module_param(sched_boost_on_input, uint, 0644);
 
-static bool sched_boost_on_powerkey_input = true;
-module_param(sched_boost_on_powerkey_input, bool, 0644);
+static unsigned int sched_boost_on_powerkey_input;
+module_param(sched_boost_on_powerkey_input, uint, 0644);
 
 static bool sched_boost_active;
 
@@ -61,18 +65,20 @@ static struct delayed_work input_boost_rem;
 static u64 last_input_time;
 #define MIN_INPUT_INTERVAL (150 * USEC_PER_MSEC)
 
-static int set_input_boost_freq(const char *buf, const struct kernel_param *kp)
+static int set_boost_freq(const char *buf, const struct kernel_param *kp)
 {
 	int i, ntokens = 0;
 	unsigned int val, cpu;
 	const char *cp = buf;
 	bool enabled = false;
-	enum input_boost_type type;
+	enum boost_type type;
 
 	if (strstr(kp->name, "input_boost_freq"))
 		type = default_input_boost;
 	if (strstr(kp->name, "powerkey_input_boost_freq"))
 		type = powerkey_input_boost;
+	if (strnstr(kp->name, "suspend_boost_freq", strlen(kp->name)))
+		type = suspend_boost;
 
 	while ((cp = strpbrk(cp + 1, " :")))
 		ntokens++;
@@ -86,6 +92,8 @@ static int set_input_boost_freq(const char *buf, const struct kernel_param *kp)
 				per_cpu(sync_info, i).input_boost_freq = val;
 			else if (type == powerkey_input_boost)
 				per_cpu(sync_info, i).powerkey_input_boost_freq = val;
+			else if (type == suspend_boost)
+				per_cpu(sync_info, i).suspend_boost_freq = val;
 		}
 		goto check_enable;
 	}
@@ -105,6 +113,8 @@ static int set_input_boost_freq(const char *buf, const struct kernel_param *kp)
 			per_cpu(sync_info, cpu).input_boost_freq = val;
 		else if (type == powerkey_input_boost)
 			per_cpu(sync_info, cpu).powerkey_input_boost_freq = val;
+		else if (type == suspend_boost)
+			per_cpu(sync_info, cpu).suspend_boost_freq = val;
 		cp = strchr(cp, ' ');
 		cp++;
 	}
@@ -118,28 +128,37 @@ check_enable:
 		}
 	}
 	input_boost_enabled = enabled;
-
+	for_each_possible_cpu(i) {
+		if (per_cpu(sync_info, i).suspend_boost_freq) {
+			suspend_boost_enabled = true;
+			break;
+		}
+	}
 	return 0;
 }
 
-static int get_input_boost_freq(char *buf, const struct kernel_param *kp)
+static int get_boost_freq(char *buf, const struct kernel_param *kp)
 {
 	int cnt = 0, cpu;
 	struct cpu_sync *s;
 	unsigned int boost_freq = 0;
-	enum input_boost_type type;
+	enum boost_type type;
 
 	if (strstr(kp->name, "input_boost_freq"))
 		type = default_input_boost;
 	if (strstr(kp->name, "powerkey_input_boost_freq"))
 		type = powerkey_input_boost;
+	if (strnstr(kp->name, "suspend_boost_freq", strlen(kp->name)))
+		type = suspend_boost;
 
 	for_each_possible_cpu(cpu) {
 		s = &per_cpu(sync_info, cpu);
 		if (type == default_input_boost)
 			boost_freq = s->input_boost_freq;
-		else if(type == powerkey_input_boost)
+		else if (type == powerkey_input_boost)
 			boost_freq = s->powerkey_input_boost_freq;
+		else if (type == suspend_boost)
+			boost_freq = s->suspend_boost_freq;
 		cnt += snprintf(buf + cnt, PAGE_SIZE - cnt,
 				"%d:%u ", cpu, boost_freq);
 	}
@@ -148,12 +167,18 @@ static int get_input_boost_freq(char *buf, const struct kernel_param *kp)
 }
 
 static const struct kernel_param_ops param_ops_input_boost_freq = {
-	.set = set_input_boost_freq,
-	.get = get_input_boost_freq,
+	.set = set_boost_freq,
+	.get = get_boost_freq,
 };
 module_param_cb(input_boost_freq, &param_ops_input_boost_freq, NULL, 0644);
 
 module_param_cb(powerkey_input_boost_freq, &param_ops_input_boost_freq, NULL, 0644);
+
+static const struct kernel_param_ops param_ops_suspend_boost_freq = {
+	.set = set_boost_freq,
+	.get = get_boost_freq,
+};
+module_param_cb(suspend_boost_freq, &param_ops_suspend_boost_freq, NULL, 0644);
 
 /*
  * The CPUFREQ_ADJUST notifier is used to override the current policy min to
@@ -190,6 +215,39 @@ static int boost_adjust_notify(struct notifier_block *nb, unsigned long val,
 static struct notifier_block boost_adjust_nb = {
 	.notifier_call = boost_adjust_notify,
 };
+
+static int suspend_boost_adjust_notify(struct notifier_block *nb, unsigned long val,
+					void *data)
+{
+	struct cpufreq_policy *policy = data;
+	unsigned int cpu = policy->cpu;
+	struct cpu_sync *s = &per_cpu(sync_info, cpu);
+	unsigned int ib_min = s->suspend_boost_min;
+
+	switch (val) {
+	case CPUFREQ_ADJUST:
+		if (!ib_min)
+			break;
+
+		pr_debug("CPU%u policy min before suspend boost: %u kHz\n",
+			cpu, policy->min);
+		pr_debug("CPU%u suspend boost min: %u kHz\n", cpu, ib_min);
+
+		cpufreq_verify_within_limits(policy, ib_min, UINT_MAX);
+
+		pr_debug("CPU%u policy min after suspend boost: %u kHz\n",
+			cpu, policy->min);
+		break;
+	}
+
+	return NOTIFY_OK;
+}
+
+
+static struct notifier_block suspend_boost_adjust_nb = {
+	.notifier_call = suspend_boost_adjust_notify,
+};
+
 
 static void update_policy_online(void)
 {
@@ -283,8 +341,8 @@ static void do_powerkey_input_boost(struct work_struct *work)
 	update_policy_online();
 
 	/* Enable scheduler boost to migrate tasks to big cluster */
-	if (sched_boost_on_powerkey_input) {
-		ret = sched_set_boost(1);
+	if (sched_boost_on_powerkey_input > 0) {
+		ret = sched_set_boost(sched_boost_on_powerkey_input);
 		if (ret)
 			pr_err("cpu-boost: HMP boost enable failed\n");
 		else
@@ -389,6 +447,46 @@ static struct input_handler cpuboost_input_handler = {
 	.id_table       = cpuboost_ids,
 };
 
+void do_suspend_boost(void)
+{
+	unsigned int i;
+	struct cpu_sync *i_sync_info;
+	if (!suspend_boost_enabled) {
+		pr_debug("suspend boost disabled, return");
+		return;
+	}
+
+	/* Set the suspend_boost_min for all CPUs in the system */
+	pr_debug("Setting suspend boost min for all CPUs\n");
+	for_each_possible_cpu(i) {
+		i_sync_info = &per_cpu(sync_info, i);
+		i_sync_info->suspend_boost_min = i_sync_info->suspend_boost_freq;
+	}
+	update_policy_online();
+}
+
+void do_suspend_boost_reset(void)
+{
+	unsigned int i;
+	struct cpu_sync *i_sync_info;
+
+	if (!suspend_boost_enabled) {
+		pr_debug("suspend boost disabled, no need to reset");
+		return;
+	}
+
+	/* Reset the suspend_boost_min for all CPUs in the system */
+	pr_debug("Resetting suspend boost min for all CPUs\n");
+	for_each_possible_cpu(i) {
+		i_sync_info = &per_cpu(sync_info, i);
+		i_sync_info->suspend_boost_min = 0;
+	}
+
+	/* Update policies for all online CPUs */
+	update_policy_online();
+}
+
+
 static int cpu_boost_init(void)
 {
 	int cpu, ret;
@@ -407,6 +505,7 @@ static int cpu_boost_init(void)
 		s->cpu = cpu;
 	}
 	cpufreq_register_notifier(&boost_adjust_nb, CPUFREQ_POLICY_NOTIFIER);
+	cpufreq_register_notifier(&suspend_boost_adjust_nb, CPUFREQ_POLICY_NOTIFIER);
 
 	ret = input_register_handler(&cpuboost_input_handler);
 	return 0;

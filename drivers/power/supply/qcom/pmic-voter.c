@@ -113,7 +113,7 @@ static void vote_min(struct votable *votable, int client_id,
 		}
 	}
 	if (strcmp(votable->name, "FG_WS") != 0) {
-			if(votable->votes[i].enabled)
+			if (votable->votes[i].enabled)
 				pr_info("%s: val: %d\n", votable->client_strs[i],
 							votable->votes[i].value);
 	}

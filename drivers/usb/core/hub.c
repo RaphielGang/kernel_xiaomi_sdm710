@@ -2120,7 +2120,7 @@ void usb_disconnect(struct usb_device **pdev)
 	dev_info(&udev->dev, "USB disconnect, device number %d\n",
 			udev->devnum);
 
-	if(connected_usb_devnum == udev->devnum)
+	if (connected_usb_devnum == udev->devnum)
 	{
 		dev_info(&udev->dev, "xiaomi headset removed, devnum %d\n",udev->devnum);
 		connected_usb_idVendor = 0;
@@ -2455,7 +2455,7 @@ int usb_new_device(struct usb_device *udev)
 	udev->dev.devt = MKDEV(USB_DEVICE_MAJOR,
 			(((udev->bus->busnum-1) * 128) + (udev->devnum-1)));
 
-	if((0x2717 == le16_to_cpu(udev->descriptor.idVendor))&&(0x3801 == le16_to_cpu(udev->descriptor.idProduct)))
+	if ((0x2717 == le16_to_cpu(udev->descriptor.idVendor))&&(0x3801 == le16_to_cpu(udev->descriptor.idProduct)))
 	{
 		connected_usb_idVendor = le16_to_cpu(udev->descriptor.idVendor);
 		connected_usb_idProduct = le16_to_cpu(udev->descriptor.idProduct);

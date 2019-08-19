@@ -25,6 +25,7 @@ include $(MY_LOCAL_PATH)/asoc/codecs/Android.mk
 include $(MY_LOCAL_PATH)/asoc/codecs/wcd934x/Android.mk
 include $(MY_LOCAL_PATH)/asoc/codecs/tas2557/Android.mk
 include $(MY_LOCAL_PATH)/asoc/codecs/dbmdx/Android.mk
+include $(MY_LOCAL_PATH)/asoc/codecs/tas2562/Android.mk
 include $(MY_LOCAL_PATH)/asoc/codecs/tfa98xx/Android.mk
 include $(MY_LOCAL_PATH)/asoc/codecs/cs35l41/Android.mk
 endif

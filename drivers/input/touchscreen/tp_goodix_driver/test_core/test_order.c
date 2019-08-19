@@ -414,7 +414,7 @@ static s32 parse_step4_addr_data(PST_TP_DEV p_dev, cu8 *string_info,
 	}
 
 mallc_exit:
-	ret = free_mem_in_heap((void *)str_tmp);
+	free_mem_in_heap((void *)str_tmp);
 	str_tmp = NULL;
 
 	return ret;

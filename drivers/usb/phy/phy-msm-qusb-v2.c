@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2014-2018, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -161,9 +162,9 @@ struct qusb_phy {
 	struct dentry		*root;
 	u8			tune[5];
 	/*xiaomi: debug fs for imp_ctr and pll_bias*/
-        u8                      imp_ctrl;
-        u8                      pll_bias;
-	u8                      bias_ctrl2;
+	u8			imp_ctrl;
+	u8			pll_bias;
+	u8			bias_ctrl2;
 
 	struct hrtimer		timer;
 	int			soc_min_rev;
@@ -446,7 +447,7 @@ static void qusb_phy_get_tune1_param(struct qusb_phy *qphy)
 
 	qphy->tune_val = TUNE_VAL_MASK(qphy->tune_val,
 				qphy->efuse_bit_pos, bit_mask);
-	if(qphy->tune_efuse_correction) {
+	if (qphy->tune_efuse_correction) {
 		int corrected_val = qphy->tune_val + qphy->tune_efuse_correction;
 		if (corrected_val < 0)
 			qphy->tune_val = 0;
@@ -457,9 +458,9 @@ static void qusb_phy_get_tune1_param(struct qusb_phy *qphy)
 	}
 
 	pr_info("%s(): tune_value:%d efuse_pll_bias:%d\n",
-                                __func__, qphy->tune_val, qphy->efuse_pll_bias);
+			  __func__, qphy->tune_val, qphy->efuse_pll_bias);
 
-	if(qphy->efuse_pll_bias) {
+	if (qphy->efuse_pll_bias) {
 #ifdef CONFIG_CHARGER_BQ25910_SLAVE
 		switch (qphy->tune_val) {
 		case 1:
@@ -482,7 +483,7 @@ static void qusb_phy_get_tune1_param(struct qusb_phy *qphy)
 				break;
 			default:
 				qphy->tune_pll_bias = 0x20;
-                                break;
+				break;
 		}
 #endif
 	}
@@ -682,13 +683,13 @@ static int qusb_phy_init(struct usb_phy *phy)
 	}
 
 	/*xiaomi: debug fs for imp_ctr and pll_bias*/
-	if(qphy->imp_ctrl)
+	if (qphy->imp_ctrl)
 	writel_relaxed(qphy->imp_ctrl, qphy->base + 0x220);
 
-	if(qphy->tune_pll_bias) {
+	if (qphy->tune_pll_bias) {
 		writel_relaxed(qphy->tune_pll_bias, qphy->base + 0x198);
 	}
-	if(qphy->pll_bias) {
+	if (qphy->pll_bias) {
 		writel_relaxed(qphy->pll_bias, qphy->base + 0x198);
 	}
 
@@ -1081,24 +1082,24 @@ static int qusb_phy_create_debugfs(struct qusb_phy *qphy)
 	}
 
 	/*xiaomi: debug fs for imp_ctr and pll_bias*/
-        file = debugfs_create_x8("imp_ctrl", 0644, qphy->root,
-                                                &qphy->imp_ctrl);
-                if (IS_ERR_OR_NULL(file)) {
-                        dev_err(qphy->phy.dev,
-                                "can't create debugfs entry for %s\n", name);
-                        debugfs_remove_recursive(qphy->root);
-                        ret = ENOMEM;
-                        goto create_err;
-                }
-        file = debugfs_create_x8("pll_bias", 0644, qphy->root,
-                                                &qphy->pll_bias);
-                if (IS_ERR_OR_NULL(file)) {
-                        dev_err(qphy->phy.dev,
-                                "can't create debugfs entry for %s\n", name);
-                        debugfs_remove_recursive(qphy->root);
-                        ret = ENOMEM;
-                        goto create_err;
-                }
+	file = debugfs_create_x8("imp_ctrl", 0644, qphy->root,
+						&qphy->imp_ctrl);
+		if (IS_ERR_OR_NULL(file)) {
+			dev_err(qphy->phy.dev,
+				"can't create debugfs entry for %s\n", name);
+			debugfs_remove_recursive(qphy->root);
+			ret = ENOMEM;
+			goto create_err;
+		}
+	file = debugfs_create_x8("pll_bias", 0644, qphy->root,
+						&qphy->pll_bias);
+		if (IS_ERR_OR_NULL(file)) {
+			dev_err(qphy->phy.dev,
+				"can't create debugfs entry for %s\n", name);
+			debugfs_remove_recursive(qphy->root);
+			ret = ENOMEM;
+			goto create_err;
+		}
 	file = debugfs_create_x8("bias_ctrl2", 0644, qphy->root,
 						&qphy->bias_ctrl2);
 	if (IS_ERR_OR_NULL(file)) {

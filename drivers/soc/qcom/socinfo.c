@@ -70,6 +70,8 @@ enum {
 	HW_PLATFORM_HDK = 31,
 	HW_PLATFORM_E2 = 32,
 	HW_PLATFORM_F2 = 34,
+	HW_PLATFORM_F3B = 35,
+	HW_PLATFORM_F3M = 38,
 	HW_PLATFORM_INVALID
 };
 
@@ -93,6 +95,8 @@ const char *hw_platform[] = {
 	[HW_PLATFORM_HDK] = "HDK",
 	[HW_PLATFORM_E2] = "SIRIUS",
 	[HW_PLATFORM_F2] = "GRUS",
+	[HW_PLATFORM_F3B] = "PYXIS",
+	[HW_PLATFORM_F3M] = "VELA",
 };
 
 enum {
@@ -1995,6 +1999,10 @@ uint32_t get_hw_version_platform(void)
 		return HARDWARE_PLATFORM_SIRIUS;
 	else if (hw_type == HW_PLATFORM_F2)
 		return HARDWARE_PLATFORM_GRUS;
+	else if (hw_type == HW_PLATFORM_F3B)
+		return HARDWARE_PLATFORM_PYXIS;
+	else if (hw_type == HW_PLATFORM_F3M)
+		return HARDWARE_PLATFORM_VELA;
 	else
 		return HARDWARE_PLATFORM_UNKNOWN;
 }

@@ -17,9 +17,9 @@
 
 #define MEMSW_FREEMEM_KB   ((memsw_freeram + memsw_filepage) << (PAGE_SHIFT - 10))
 #define MEMSW_FREESWAP_KB  (get_nr_swap_pages() << (PAGE_SHIFT - 10))
-#define MEMSW_EXTRA_KB     (16 << (PAGE_SHIFT - 10)) //16 pages extra
+#define MEMSW_EXTRA_KB     (16 << (PAGE_SHIFT - 10))
 
-static uint32_t check_pending_times = 0;
+static uint32_t check_pending_times;
 
 static int memsw_dev_open(struct inode *inode, struct file *file)
 {
@@ -27,12 +27,12 @@ static int memsw_dev_open(struct inode *inode, struct file *file)
 	struct memsw_reader *reader;
 	int ret, i = MINOR(inode->i_rdev);
 
-	//get dev, and check minor
+
 	memsw_dev = memsw_dev_get_w_check(i);
 	if (memsw_dev == NULL)
 		return -ENODEV;
 
-	//this is a read only device file
+
 	if (!(file->f_mode & FMODE_READ))
 		ret = -EBADF;
 
@@ -225,7 +225,7 @@ static inline int memsw_dev_check_pending(void)
 {
 	struct memsw_dev *memsw_dev = memsw_dev_get_wo_check();
 
-	if(memsw_dev_event_pending(memsw_dev))
+	if (memsw_dev_event_pending(memsw_dev))
 		wake_up_interruptible(&memsw_dev->wq);
 
 	return 0;
@@ -249,7 +249,7 @@ static int kmemsw_chkd(void *data)
 		memsw_dev_check_pending();
 		kmemsw_chkd_try_to_sleep();
 	}
-	return -1;
+	return -EPERM;
 }
 
 void wakeup_kmemsw_chkd(void)
@@ -260,7 +260,7 @@ void wakeup_kmemsw_chkd(void)
 }
 EXPORT_SYMBOL(wakeup_kmemsw_chkd);
 
-static struct task_struct *kmemswchkd_ktp = NULL;
+static struct task_struct *kmemswchkd_ktp;
 static int __init kmemswchkd_init(void)
 {
 	int ret = 0;
@@ -272,9 +272,9 @@ static int __init kmemswchkd_init(void)
 	}
 
 	if (kmemswchkd_ktp)
-		return -1;
+		return -EPERM;
 
-	//create kernel thread for memory swap check
+
 	kmemswchkd_ktp = kthread_run(kmemsw_chkd, NULL, "kmemsw_chkd");
 	if (IS_ERR(kmemswchkd_ktp)) {
 		printk(KERN_WARNING"Failed to start kmemswchkd thread.\n");

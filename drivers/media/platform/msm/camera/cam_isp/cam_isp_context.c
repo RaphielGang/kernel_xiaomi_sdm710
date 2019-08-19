@@ -305,7 +305,7 @@ static int __cam_isp_ctx_handle_buf_done_in_activated_state(
 				req_isp->fence_map_out[j].sync_id);
 
 			rc = cam_sync_signal(req_isp->fence_map_out[j].sync_id,
-				CAM_SYNC_STATE_SIGNALED_ERROR);
+				CAM_SYNC_STATE_SIGNALED_SUCCESS);
 			if (rc)
 				CAM_ERR(CAM_ISP, "Sync failed with rc = %d",
 					rc);
@@ -360,6 +360,8 @@ static void __cam_isp_ctx_send_sof_timestamp(
 {
 	struct cam_req_mgr_message   req_msg;
 
+	if (request_id == 0)
+		return;
 	req_msg.session_hdl = ctx_isp->base->session_hdl;
 	req_msg.u.frame_msg.frame_id = ctx_isp->frame_id;
 	req_msg.u.frame_msg.request_id = request_id;

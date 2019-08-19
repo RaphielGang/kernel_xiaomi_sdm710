@@ -32,6 +32,13 @@ extern s32 short_test_func(IN_OUT ptr32 p_data)
 	u16 err_code = SHORT_TEST_NONE_ERROR;
 	PST_TEST_ITEM p_test_item = (PST_TEST_ITEM) p_data;
 	PST_SHORT_TEST_RES p_test_res = NULL;
+	u16 short_test_flag = 5;
+
+SHORT_TEST_START:
+	ret = 0;
+	err_code = SHORT_TEST_NONE_ERROR;
+	p_test_item = (PST_TEST_ITEM) p_data;
+	p_test_res = NULL;
 
 	/*//-----------------Judge parameter----------------*/
 	if (0 == judge_test_item_legal((PST_TEST_ITEM) p_data)) {
@@ -91,6 +98,12 @@ SHORTTEST_END:
 		board_print_warning
 			("[short test]recovry chip status error!\n");
 		err_code = SHORT_TEST_END_FAIL;
+	}
+	if ((p_test_res->item_res_header.test_item_err_code.
+			ptr_err_code_set[0] != 0) && short_test_flag) {
+		board_print_error("test_result retry short test");
+		short_test_flag--;
+		goto SHORT_TEST_START;
 	}
 	/*//notify test result*/
 	if (p_test_item->ptr_test_item_finished_func) {
@@ -337,7 +350,7 @@ extern void short_test_channel_map(IN ptr32 p_data,
 									2;
 									k++) {
 									if (p_dev->cfg[p_dev->drv1_start_addr - p_dev->cfg_start_addr + k] == ic_chn_num) {
-										p_short_res->short_mess_arr[i] = CHANNEL_TX_FLAG | j;	//((p_dev->max_drv_num / 2) + k);
+										p_short_res->short_mess_arr[i] = CHANNEL_TX_FLAG | j;
 										valid_chn_mark
 											[i]
 											=

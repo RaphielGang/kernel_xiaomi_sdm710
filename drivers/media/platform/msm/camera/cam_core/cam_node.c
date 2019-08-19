@@ -159,10 +159,10 @@ static int __cam_node_handle_acquire_dev(struct cam_node *node,
 			node->name);
 		cam_node_print_ctx_state(node);
 
-		// Recycle oldest ctx in acquired list
+
 		cam_node_recycle_ctxt_from_acquired_list(node);
 
-		// Try again to get a ctx from free list
+
 		ctx = cam_node_get_ctxt_from_free_list(node);
 		if (!ctx) {
 			rc = -ENOMEM;

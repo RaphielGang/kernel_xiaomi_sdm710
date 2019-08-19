@@ -49,7 +49,7 @@ static struct proc_dir_entry *last_modem_sfr_entry;
 
 #define subsys_to_drv(d) container_of(d, struct modem_data, subsys_desc)
 
-static struct kobject* checknv_kobj;
+static struct kobject *checknv_kobj;
 static struct kset *checknv_kset;
 
 static const struct sysfs_ops checknv_sysfs_ops = {
