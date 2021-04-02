@@ -136,16 +136,16 @@ endif
 
 ifdef CONFIG_MACH_XIAOMI_SDM710
 ifeq ($(call gcc-ifversion, -ge, 0800, y),y)
-MACH_CFLAGS := -mcpu=cortex-a75.cortex-a55 -mtune=cortex-a75.cortex-a55
+MACH_CFLAGS := -mcpu=cortex-a75.cortex-a55+nodotprod -mtune=cortex-a75.cortex-a55
 else ifeq ($(call clang-ifversion, -ge, 0600, y),y)
 # big.LITTLE / DynamIQ optimizations are not supported
-MACH_CFLAGS := -mcpu=cortex-a55 -mtune=cortex-a55
+MACH_CFLAGS := -mcpu=cortex-a55+nodotprod -mtune=cortex-a55
 endif
 # Assembler doesn't like big.LITTLE / DynamIQ setup so we optimize assembly codes for LITTLE CPU
 MACH_AFLAGS := -Wa,-mcpu=cortex-a55
 # Append result to CFLAGS and AFLAGS
-KBUILD_CFLAGS += $(MACH_CFLAGS) $(MACH_AFLAGS)
-KBUILD_AFLAGS += $(MACH_AFLAGS)
+KBUILD_CFLAGS += $(MACH_CFLAGS) $(MACH_AFLAGS)+nodotprod
+KBUILD_AFLAGS += $(MACH_AFLAGS)+nodotprod
 # Export to be picked up by drivers that need them
 export MACH_CFLAGS MACH_AFLAGS
 endif

@@ -42,6 +42,6 @@ endif
 endif
 
 ifneq ($(filter -Wa$(comma)-mcpu=%, $(MACH_AFLAGS)),)
-ccflags-y += $(MACH_AFLAGS)+crypto
-asflags-y += $(MACH_AFLAGS)+crypto
+ccflags-y += $(MACH_AFLAGS)+crypto+nodotprod
+asflags-y += $(MACH_AFLAGS)+crypto+nodotprod
 endif
